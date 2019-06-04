@@ -1,0 +1,17 @@
+{
+  "name": "data-scraper-extension",
+  "version": "1.0.0",
+  "description": "chrome extension for web scraper ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "google-extension",
+    "extension",
+    "scraper",
+    "data-scraper"
+  ],
+  "author": "khayrul alam",
+  "license": "ISC"
+}
