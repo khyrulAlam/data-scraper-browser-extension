@@ -1,0 +1,21 @@
+body {
+  margin: 0 auto;
+  background: #e6e6e1;
+  overflow: scroll;
+}
+
+.nav-tabs {
+  background: #d8d085;
+  padding-bottom: 1px;
+}
+.tab-content {
+  background: #fff;
+  padding: 10px 15px;
+  box-shadow: 0 3px 12px 0px #33333326;
+}
+.nav-tabs .nav-link {
+  color: #ffffff;
+}
+hr {
+  border-top: 1px dashed rgb(0, 0, 0);
+}

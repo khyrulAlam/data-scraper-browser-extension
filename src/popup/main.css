@@ -1,3 +1,93 @@
+@import url("https://fonts.googleapis.com/css?family=Fira+Sans+Condensed:300,400,500,600&display=swap");
+
+h3,
+h1,
+p {
+  margin: 0;
+  padding: 0;
+}
 body {
-  background: red;
+  width: 350px;
+  height: 400px;
+  margin: 0 auto;
+  font-family: "Fira Sans Condensed", sans-serif;
+}
+#header {
+  padding: 5px 10px;
+  border: 1px solid #3333333d;
+  background: #ffeb3b;
+  height: 18vh;
+}
+
+#header h1 {
+  font-family: "Fira Sans Condensed", sans-serif;
+  margin: 0;
+  text-align: center;
+  padding-bottom: 8px;
+  color: #818c11;
+  text-transform: uppercase;
+}
+
+.header-opt > input {
+  font-family: "Fira Sans Condensed", sans-serif;
+  width: 65%;
+  height: 25px;
+  border-radius: 15px;
+  border: none;
+  padding-left: 3px;
+}
+.header-opt > button {
+  font-family: "Fira Sans Condensed", sans-serif;
+  height: 27px;
+  border-radius: 15px;
+  width: 32%;
+  background: #86901d;
+  border: 0px solid #fff;
+  color: #f9e851;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+#footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background: #ffeb3b;
+  padding: 5px 0px;
+  color: #86901d;
+  font-family: "Fira Sans Condensed", sans-serif;
+}
+
+#main {
+  height: 75vh;
+  background: #f7f7f7;
+  font-family: "Fira Sans Condensed", sans-serif;
+}
+#homePage {
+  padding: 3px;
+}
+#homePage .article {
+  padding: 10px;
+  margin-bottom: 3px;
+  background: #fff;
+  box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+#homePage .article h3 {
+  margin-bottom: 3px;
+}
+#homePage .article .run {
+  color: #86901d;
+  position: absolute;
+  right: 3%;
+  top: 25%;
+  border: none;
+  background: #ffeb3b;
+  padding: 5px 11px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
 }
