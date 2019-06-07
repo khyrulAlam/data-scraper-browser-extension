@@ -1,5 +1,5 @@
 import "./main.css";
-import { tabParams } from "../utils/globalVar";
+import { tabParams, storeValue } from "../utils/globalVar";
 
 //element selector
 let newSchema = document.querySelector("#newSchema");
@@ -17,4 +17,18 @@ newSchema.addEventListener("click", e => {
       window.close();
     }, 400);
   });
+});
+
+chrome.tabs.query(tabParams, function(tabs) {
+  let url = new URL(tabs[0].url);
+  if (url.protocol === "file:") {
+    document.body.innerHTML =
+      "<h3>Something wrong. your url must be http or https protocol. </h3>";
+  } else {
+    let host = url.hostname.replace(/\./g, "_");
+    chrome.storage.sync.get([host], function(res) {
+      storeValue[host] = res[host] || [];
+      console.log("host", host, "store value", storeValue);
+    });
+  }
 });

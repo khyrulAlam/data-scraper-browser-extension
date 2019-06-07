@@ -13,5 +13,6 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
       } else {
         tabId = message.tabId;
       }
+      break;
   }
 });

@@ -10,3 +10,4 @@ export const schemaObj = {
     columns: []
   }
 };
+export const storeValue = {};

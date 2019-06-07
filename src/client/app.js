@@ -4,7 +4,7 @@ import {
   RunTimeSendMsg,
   InputCheckList
 } from "../utils/module";
-import { schemaObj } from "../utils/globalVar";
+import { schemaObj, storeValue } from "../utils/globalVar";
 
 let elUtility = new ElementsCreateUtility();
 let runtimeSendMessage = new RunTimeSendMsg();
@@ -113,3 +113,9 @@ function gotMessage(message, sender) {
     elUtility.tableBody(message.tableItem);
   }
 }
+
+// save schema on chrome store 🏪
+let saveSchema = document.querySelector("#saveSchema");
+saveSchema.addEventListener("click", function() {
+  console.log(storeValue);
+});
