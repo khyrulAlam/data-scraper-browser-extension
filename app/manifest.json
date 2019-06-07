@@ -26,9 +26,9 @@
     "default_popup": "popup/index.html",
     "default_title": "Data Scraper 🙉"
   },
-  // "background": {
-  //   "scripts": ["background-script.js"]
-  // },
+  "background": {
+    "scripts": ["background-script.js"]
+  },
   "options_page": "client/index.html",
   "options_ui": {
     "page": "client/index.html",

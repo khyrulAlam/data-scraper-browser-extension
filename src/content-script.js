@@ -1,16 +1,17 @@
-import { tableItem } from "./utils/globalVar";
-import { IframeElement } from "./utils/module";
-//\/\/\/\/\/\
-//\/\/\/\/\/
-//\/\\\//\\
-//\\
+import {
+  IframeElement,
+  FindDesireOption,
+  DesireOptionClassList
+} from "./utils/module";
+let tableItem = [];
 
 let _iframe = new IframeElement();
+let wk = new FindDesireOption();
+let dsOption = new DesireOptionClassList();
 
 //receive massage 🚀
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
-  console.log(sender, message);
   let _text = message.text;
   switch (_text) {
     case "create_iframe":
@@ -20,36 +21,33 @@ function gotMessage(message, sender) {
       _iframe.removeIframe();
       break;
     case "start_mouse_move":
-      var wk = new FindDesireOption();
       document.addEventListener("mouseover", wk.drawOutline);
       document.addEventListener("mouseout", wk.removeOutline);
       break;
     case "stop_mouse_move":
-      let wk2 = new FindDesireOption();
-      document.removeEventListener("mouseover", wk2.drawOutline);
-      document.removeEventListener("mouseout", wk2.removeOutline);
-      let lists = new DesireOptionClassList().getList();
-      chrome.runtime.sendMessage({
+      document.removeEventListener("mouseover", wk.drawOutline);
+      document.removeEventListener("mouseout", wk.removeOutline);
+      let lists = dsOption.getList();
+      sendMessage({
         text: "class_lists",
         ref: message.ref,
         lists
       });
       break;
     case "mark_element":
-      let draw = new DesireOptionClassList();
       if (message.clsName.isElement) {
         let elements = document.querySelectorAll(`${message.clsName.name}`);
-        draw.markSelectedClass(elements);
+        dsOption.markSelectedClass(elements);
       } else {
         let elements = document.querySelectorAll(`.${message.clsName.name}`);
-        draw.markSelectedClass(elements);
+        dsOption.markSelectedClass(elements);
       }
       break;
     case "run_script":
       tableItem = [];
-      rows = document.querySelectorAll(message.schema.row.rowCls);
+      let rows = document.querySelectorAll(message.schema.row.rowCls);
       rows.forEach(row => {
-        obj = {};
+        let obj = {};
         message.schema.columns.map(item => {
           obj[item.colName] =
             row.querySelector(item.colCls) &&
@@ -59,7 +57,7 @@ function gotMessage(message, sender) {
         });
         tableItem.push(obj);
       });
-      chrome.runtime.sendMessage({
+      sendMessage({
         text: "data_table",
         tableItem
       });

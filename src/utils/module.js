@@ -1,9 +1,11 @@
-import { chromeId } from "./globalVar";
+import { chromeId, schemaObj } from "./globalVar";
+var sTarget;
+var prevElementFlag;
 
 export class FindDesireOption {
   drawOutline(ev) {
     ev.target.style.outline = "2px solid #ffc107";
-    __sTarget = ev.target;
+    sTarget = ev.target;
   }
   removeOutline(ev) {
     ev.target.style.outline = "";
@@ -16,11 +18,9 @@ export class DesireOptionClassList {
     this.element = "";
   }
   getList() {
-    this.attributes.push(...__sTarget["classList"]);
-    this.element = __sTarget.localName;
     return {
-      attributes: this.attributes,
-      element: this.element
+      attributes: [...sTarget["classList"]],
+      element: sTarget.localName
     };
   }
   markSelectedClass(element) {
@@ -98,5 +98,153 @@ export class IframeElement {
   removeIframe() {
     let element = document.getElementById(this.elId);
     element.parentNode.removeChild(element);
+  }
+}
+
+export class ElementsCreateUtility {
+  constructor() {
+    this.count = 1;
+  }
+  addNewColumnField(element) {
+    this.count++;
+    element.innerHTML = `<div class="col-12">
+        <input type="text" class="form-control" name="colName" placeholder="Column Name">
+      </div>
+      <div class="col-9">
+          <input type="text" class="form-control" name="colCls" placeholder="Class Name">
+      </div>
+      <div class="col-3">
+          <button type="button" class="btn btn-primary mouseMove-col" data-col="colNum${
+            this.count
+          }">Drag</button>
+      </div>
+      <div class="class-checkbox-dom">
+      </div>
+    </div>`;
+  }
+  createTable(tableElement) {
+    tableElement.classList.add("table", "table-bordered");
+    tableElement.innerHTML += `<thead id="tbhead"><tr><td>No.</td></tr></thead><tbody id="tbbody"></tbody>`;
+  }
+  tableHead(obj) {
+    Object.keys(obj).forEach(key => {
+      document.querySelector("#tbhead tr").innerHTML += `<th>${key}</th>`;
+    });
+  }
+  tableBody(tableItems) {
+    tableItems.map((item, i) => {
+      let tr = document.createElement("tr");
+      tr.innerHTML += `<td>${i + 1}</td>`;
+      Object.keys(item).forEach(key => {
+        tr.innerHTML += `<td>${item[key]}</td>`;
+      });
+      document.querySelector("#tbbody").append(tr);
+    });
+  }
+}
+
+export class RunTimeSendMsg {
+  constructor() {
+    this.tabParams = {
+      active: true,
+      currentWindow: true
+    };
+  }
+  send(msg) {
+    chrome.tabs.query(this.tabParams, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, msg);
+    });
+  }
+}
+
+export class InputCheckList extends RunTimeSendMsg {
+  constructor(element, lists) {
+    super();
+    this.element = element;
+    this.lists = lists;
+    this.element.innerHTML = "";
+  }
+  makeCheckBox() {
+    if (this.lists.attributes && this.lists.attributes.length === 0) {
+      let obj = {
+        name: this.lists.element,
+        isElement: true
+      };
+      this.element.innerHTML += `<div class="form-check">
+      <input class="form-check-input" type="radio" name="cls" value="${encodeURIComponent(
+        JSON.stringify(obj)
+      )}">
+      <label class="form-check-label">
+        ${this.lists.element}
+      </label>
+    </div>`;
+      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-4" id="doneSelect">Done</button>`;
+    } else {
+      this.lists.attributes.forEach(cls => {
+        let obj = {
+          name: cls,
+          isElement: false
+        };
+        this.element.innerHTML += `<div class="form-check">
+        <input class="form-check-input" type="radio" name="cls" value="${encodeURIComponent(
+          JSON.stringify(obj)
+        )}">
+        <label class="form-check-label">
+          ${cls}
+        </label>
+      </div>`;
+      });
+      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-4" id="doneSelect">Done</button>`;
+    }
+  }
+  selectClass() {
+    this.element.addEventListener("change", e => {
+      let val = document.querySelector("input[name=cls]:checked").value;
+      let rowCls = document.querySelector("input[name=rowCls]");
+      let clsName = JSON.parse(decodeURIComponent(val));
+      if (clsName.isElement) {
+        rowCls.value = clsName.name;
+      } else {
+        rowCls.value = "." + clsName.name;
+      }
+      let msg = {
+        text: "mark_element",
+        clsName
+      };
+      this.send(msg);
+    });
+    let doneSelect = document.querySelector("#doneSelect");
+    doneSelect.addEventListener("click", function(e) {
+      let rowName = document.querySelector("input[name=rowName]").value
+        ? document.querySelector("input[name=rowName]").value
+        : "row";
+      let rowCls = document.querySelector("input[name=rowCls]").value;
+      schemaObj.schema["row"] = { rowName, rowCls };
+      e.target.parentElement.innerHTML = "";
+    });
+  }
+  selectClassForCol(parentEl) {
+    this.element.addEventListener("change", e => {
+      let val = this.element.querySelector("input[name=cls]:checked").value;
+      let colClass = parentEl.querySelector("input[name=colCls]");
+      let clsName = JSON.parse(decodeURIComponent(val));
+      clsName.isElement
+        ? (colClass.value = clsName.name)
+        : (colClass.value = "." + clsName.name);
+      let msg = {
+        text: "mark_element",
+        clsName
+      };
+      this.send(msg);
+    });
+    let doneSelect = document.querySelector("#doneSelect");
+    doneSelect.addEventListener("click", function(e) {
+      let colName = parentEl.querySelector("input[name=colName]").value
+        ? parentEl.querySelector("input[name=colName]").value
+        : "colName";
+      let colCls = parentEl.querySelector("input[name=colCls]").value;
+      schemaObj.schema.columns.push({ colName, colCls });
+      e.target.parentElement.innerHTML = "";
+    });
   }
 }

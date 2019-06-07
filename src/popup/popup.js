@@ -11,6 +11,7 @@ newSchema.addEventListener("click", e => {
       text: "create_iframe",
       tabId: tabs[0].id
     };
+    chrome.runtime.sendMessage(obj);
     chrome.tabs.sendMessage(tabs[0].id, obj);
     setTimeout(() => {
       window.close();

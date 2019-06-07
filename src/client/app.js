@@ -1,74 +1,115 @@
 import "./main.css";
-window.onload = function() {
-  let iframe = document.querySelector("#iframe");
-  iframe.classList.add(`tab${location.search.match(/id=([^&]*)/i)[1]}`);
-  iframe.innerHTML = `
-    
-  <ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li class="nav-item">
-      <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home"
-          aria-selected="true">Start</a>
-  </li>
-  <li class="nav-item">
-      <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile"
-          aria-selected="false">Cols</a>
-  </li>
-  <li class="nav-item">
-      <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact"
-          aria-selected="false">Preview & Save </a>
-  </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-  <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-      <div class="schema-name">
-          <div class="form-group">
-              <input type="text" class="form-control" id="schemaName" placeholder="schemaName">
-          </div>
-          <div class="form-row">
-              <div class="col-12">
-                  <input type="text" class="form-control" name="rowName" placeholder="Row Name">
-              </div>
-              <div class="col-9">
-                  <input type="text" class="form-control" name="rowCls" placeholder="Class Name">
-              </div>
-              <div class="col-3">
-                  <button type="button" class="btn btn-primary" id="startPickMouse">Drag</button>
-              </div>
-          </div>
-          <div class="checkbox-dom">
-          </div>
-      </div>
-  </div>
-  <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-      <div>
-          <div class="form-row colNum1">
-              <div class="col-12">
-                  <input type="text" class="form-control" name="colName" placeholder="Column Name">
-              </div>
-              <div class="col-9">
-                  <input type="text" class="form-control" name="colCls" placeholder="Class Name">
-              </div>
-              <div class="col-3">
-                  <button type="button" class="btn btn-primary mouseMove-col" data-col="colNum1">Drag</button>
-              </div>
-              <div class="class-checkbox-dom">
-              </div>
-          </div>
-          <div id="addAnotherDom"></div>
-          <div>
-              <button type="button" class="btn btn-success mt-3" id="addMoreCol">ADD ANOTHER</button>
-          </div>
-      </div>
-  </div>
-  <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-      <div>
-          <button type="button" class="btn btn-warning mb-2" id="jalalRun">Run</button>
-          <button type="button" class="btn btn-success mb-2" id="saveSchema">Save Schema</button>
-      </div>
-      <div id="resultTable"></div>
-  </div>
-</div>
+import {
+  ElementsCreateUtility,
+  RunTimeSendMsg,
+  InputCheckList
+} from "../utils/module";
+import { schemaObj } from "../utils/globalVar";
 
-  
-  `;
-};
+let elUtility = new ElementsCreateUtility();
+let runtimeSendMessage = new RunTimeSendMsg();
+let columnCount = { ref: "" };
+
+/* ***********************
+👊  Event Handle 👊
+************************** */
+
+// 👉 schema Name
+let schemaName = document.querySelector("#schemaName");
+schemaName.addEventListener("keyup", e => {
+  schemaObj.name = e.target.value.trim();
+});
+
+// 👉 Send mouse event to content page
+let startPickMouse = document.querySelector("#startPickMouse");
+startPickMouse.addEventListener("click", e => {
+  let msg = {
+    text: "start_mouse_move"
+  };
+  runtimeSendMessage.send(msg);
+  columnCount.ref = "row_name";
+  document.addEventListener("keypress", stopMouseEvent);
+});
+
+// 👉 send Stop Mouse event to content page
+function stopMouseEvent(ev) {
+  if (ev.charCode === 115 && ev.code === "KeyS") {
+    let msg = {
+      text: "stop_mouse_move",
+      ref: columnCount.ref
+    };
+    runtimeSendMessage.send(msg);
+    document.removeEventListener("keypress", stopMouseEvent);
+  }
+}
+
+// 👉 add another column field
+let addAnotherDom = document.querySelector("#addAnotherDom");
+let addMoreCol = document.querySelector("#addMoreCol");
+addMoreCol.addEventListener("click", e => {
+  let newItem = document.createElement("div");
+  elUtility.addNewColumnField(newItem);
+  let classList = ["form-row", "mt-2", `colNum${elUtility.count}`];
+  newItem.classList.add(...classList);
+  addAnotherDom.appendChild(newItem);
+  mouseMoveEventReady();
+});
+// 👉 new column mouse event
+mouseMoveEventReady();
+function mouseMoveEventReady() {
+  let mouseMoveCol = document.querySelectorAll(".mouseMove-col");
+  mouseMoveCol.forEach(el =>
+    el.addEventListener("click", e => {
+      let msg = {
+        text: "start_mouse_move"
+      };
+      runtimeSendMessage.send(msg);
+      columnCount.ref = e.target.dataset.col;
+      document.addEventListener("keypress", stopMouseEvent);
+    })
+  );
+}
+
+// 👉 run schema message to content page;
+let runJalal = document.querySelector("#jalalRun");
+runJalal.addEventListener("click", e => {
+  let msg = {
+    text: "run_script",
+    schema: schemaObj.schema
+  };
+  runtimeSendMessage.send(msg);
+});
+
+// 📡 Receive Message 📡
+chrome.runtime.onMessage.addListener(gotMessage);
+function gotMessage(message, sender) {
+  // console.log("========= option page 🐌 =========== ");
+  // console.log(message);
+  // console.log("========= option page 🐌 =========== ");
+  let _text = message.text;
+  if (_text === "class_lists") {
+    if (message.ref === "row_name") {
+      let checkboxDom = document.querySelector(".checkbox-dom");
+      let inputBox = new InputCheckList(checkboxDom, message.lists);
+      inputBox.makeCheckBox();
+      inputBox.selectClass();
+    } else {
+      let sec = document.querySelector(`.${message.ref}`);
+      let checkboxDom = sec.querySelector(".class-checkbox-dom");
+      let inputBox = new InputCheckList(checkboxDom, message.lists);
+      inputBox.makeCheckBox();
+      inputBox.selectClassForCol(sec);
+    }
+  }
+  if (_text === "data_table") {
+    console.table(message.tableItem);
+    let resultTable = document.querySelector("#resultTable");
+    resultTable.innerHTML = "";
+    resultTable.style["font-size"] = "12px";
+    let table = document.createElement("table");
+    elUtility.createTable(table);
+    resultTable.append(table);
+    elUtility.tableHead(message.tableItem[0]);
+    elUtility.tableBody(message.tableItem);
+  }
+}
