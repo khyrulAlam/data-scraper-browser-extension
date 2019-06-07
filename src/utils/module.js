@@ -97,7 +97,9 @@ export class IframeElement {
   }
   removeIframe() {
     let element = document.getElementById(this.elId);
-    element.parentNode.removeChild(element);
+    if (element) {
+      element.parentNode.removeChild(element);
+    }
   }
 }
 
