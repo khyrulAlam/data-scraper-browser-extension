@@ -8,6 +8,7 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
       if (tabId) {
         if (tabId !== message.tabId) {
           chrome.tabs.sendMessage(tabId, { text: "remove_iframe" });
+          tabId = message.tabId;
         }
         console.log(message.tabId, "old", tabId);
       } else {

@@ -267,13 +267,13 @@ export class StoreData {
   }
 
   saveData(data) {
-    chrome.storage.sync.get([this.hostName], function(result) {
+    chrome.storage.sync.get([this.hostName], result => {
       let preData = result || {};
-      if (!this.hostName in preData) {
+      if (!(this.hostName in preData)) {
         preData[this.hostName] = {};
       }
       Object.keys(preData).forEach(key => {
-        preData[key][data.name] = data;
+        preData[key][data.name.replace(/ /g, "_")] = data;
         chrome.storage.sync.set(preData, function() {
           console.log("save");
         });

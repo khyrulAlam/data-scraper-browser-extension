@@ -3,8 +3,7 @@ import {
   ElementsCreateUtility,
   RunTimeSendMsg,
   InputCheckList,
-  StoreData,
-  IframeElement
+  StoreData
 } from "../utils/module";
 import { schemaObj, storeValue } from "../utils/globalVar";
 
@@ -123,7 +122,9 @@ saveSchema.addEventListener("click", function() {
     let store = new StoreData(tab.url);
     if (schemaObj.name != "") {
       store.saveData(schemaObj);
-      new IframeElement().removeIframe();
+      setTimeout(() => {
+        runtimeSendMessage.send({ text: "remove_iframe" });
+      }, 200);
     } else {
       console.log("schema name is null");
     }
