@@ -250,3 +250,34 @@ export class InputCheckList extends RunTimeSendMsg {
     });
   }
 }
+
+export class StoreData {
+  constructor(url) {
+    this.urlInfo = new URL(url);
+    this.hostName = this.urlInfo.hostname
+      .replace(/\./g, "_")
+      .trim()
+      .toString();
+    this.data = null;
+  }
+
+  getKey() {
+    if (!this.hostName) return false;
+    return this.hostName;
+  }
+
+  saveData(data) {
+    chrome.storage.sync.get([this.hostName], function(result) {
+      let preData = result || {};
+      if (!this.hostName in preData) {
+        preData[this.hostName] = {};
+      }
+      Object.keys(preData).forEach(key => {
+        preData[key][data.name] = data;
+        chrome.storage.sync.set(preData, function() {
+          console.log("save");
+        });
+      });
+    });
+  }
+}

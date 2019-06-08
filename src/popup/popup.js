@@ -1,6 +1,6 @@
 import "./main.css";
 import { tabParams, storeValue } from "../utils/globalVar";
-
+import { StoreData } from "../utils/module";
 //element selector
 let newSchema = document.querySelector("#newSchema");
 
@@ -20,15 +20,9 @@ newSchema.addEventListener("click", e => {
 });
 
 chrome.tabs.query(tabParams, function(tabs) {
-  let url = new URL(tabs[0].url);
-  if (url.protocol === "file:") {
+  let store = new StoreData(tabs[0].url);
+  if (store.getKey() === false) {
     document.body.innerHTML =
       "<h3>Something wrong. your url must be http or https protocol. </h3>";
-  } else {
-    let host = url.hostname.replace(/\./g, "_");
-    chrome.storage.sync.get([host], function(res) {
-      storeValue[host] = res[host] || [];
-      console.log("host", host, "store value", storeValue);
-    });
   }
 });

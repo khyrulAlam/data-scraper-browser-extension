@@ -2,7 +2,9 @@ import "./main.css";
 import {
   ElementsCreateUtility,
   RunTimeSendMsg,
-  InputCheckList
+  InputCheckList,
+  StoreData,
+  IframeElement
 } from "../utils/module";
 import { schemaObj, storeValue } from "../utils/globalVar";
 
@@ -117,5 +119,24 @@ function gotMessage(message, sender) {
 // save schema on chrome store 🏪
 let saveSchema = document.querySelector("#saveSchema");
 saveSchema.addEventListener("click", function() {
-  console.log(storeValue);
+  chrome.tabs.getCurrent(function(tab) {
+    let store = new StoreData(tab.url);
+    if (schemaObj.name != "") {
+      store.saveData(schemaObj);
+      new IframeElement().removeIframe();
+    } else {
+      console.log("schema name is null");
+    }
+  });
+});
+
+let GData = document.querySelector("#getData");
+GData.addEventListener("click", function() {
+  chrome.tabs.getCurrent(tab => {
+    let store = new StoreData(tab.url);
+    let key = store.getKey();
+    chrome.storage.sync.get([key], result => {
+      console.log(result);
+    });
+  });
 });
