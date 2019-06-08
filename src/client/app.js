@@ -84,9 +84,6 @@ runJalal.addEventListener("click", e => {
 // 📡 Receive Message 📡
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
-  // console.log("========= option page 🐌 =========== ");
-  // console.log(message);
-  // console.log("========= option page 🐌 =========== ");
   let _text = message.text;
   if (_text === "class_lists") {
     if (message.ref === "row_name") {
@@ -128,16 +125,5 @@ saveSchema.addEventListener("click", function() {
     } else {
       console.log("schema name is null");
     }
-  });
-});
-
-let GData = document.querySelector("#getData");
-GData.addEventListener("click", function() {
-  chrome.tabs.getCurrent(tab => {
-    let store = new StoreData(tab.url);
-    let key = store.getKey();
-    chrome.storage.sync.get([key], result => {
-      console.log(result);
-    });
   });
 });

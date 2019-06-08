@@ -76,6 +76,7 @@ body {
 }
 #homePage .article h3 {
   margin-bottom: 3px;
+  text-transform: capitalize;
 }
 #homePage .article .run {
   color: #86901d;
