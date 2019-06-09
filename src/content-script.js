@@ -45,22 +45,42 @@ function gotMessage(message, sender) {
       break;
     case "run_script":
       tableItem = [];
-      let rows = document.querySelectorAll(message.schema.row.rowCls);
-      rows.forEach(row => {
-        let obj = {};
-        message.schema.columns.map(item => {
-          obj[item.colName] =
-            row.querySelector(item.colCls) &&
-            row.querySelector(item.colCls).textContent
-              ? row.querySelector(item.colCls).textContent
-              : "";
+      var rows = document.querySelectorAll(message.schema.row.rowCls);
+      if (rows) {
+        rows.forEach(row => {
+          var obj = {};
+          message.schema.columns.map(item => {
+            obj[item.colName] =
+              row.querySelector(item.colCls) &&
+              row.querySelector(item.colCls).textContent
+                ? row.querySelector(item.colCls).textContent
+                : "";
+          });
+          tableItem.push(obj);
         });
-        tableItem.push(obj);
-      });
-      sendMessage({
-        text: "data_table",
-        tableItem
-      });
+        sendMessage({
+          text: "data_table",
+          tableItem
+        });
+      }
+      break;
+    case "run_script_from_popup":
+      tableItem = [];
+      var rows = document.querySelectorAll(message.schema.row.rowCls);
+      if (rows) {
+        rows.forEach(row => {
+          var obj = {};
+          message.schema.columns.map(item => {
+            obj[item.colName] =
+              row.querySelector(item.colCls) &&
+              row.querySelector(item.colCls).textContent
+                ? row.querySelector(item.colCls).textContent.trim()
+                : "";
+          });
+          tableItem.push(obj);
+        });
+        console.log(tableItem);
+      }
       break;
   }
 }

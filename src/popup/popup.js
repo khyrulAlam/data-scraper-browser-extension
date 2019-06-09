@@ -1,9 +1,11 @@
 import "./main.css";
 import { tabParams, storeValue } from "../utils/globalVar";
-import { StoreData } from "../utils/module";
+import { StoreData, RunTimeSendMsg } from "../utils/module";
+let runTimeSendMsg = new RunTimeSendMsg();
 //element selector
 let newSchema = document.querySelector("#newSchema");
 let homePage = document.querySelector("#homePage");
+// var console  = chrome.extension.getBackgroundPage().console;
 
 // send message to content-script for new schema
 newSchema.addEventListener("click", e => {
@@ -32,15 +34,30 @@ chrome.tabs.query(tabParams, function(tabs) {
       if (key in result) {
         let data = result[key];
         Object.keys(data).forEach(key => {
+          storeValue[key] = data[key];
           homePage.innerHTML += `
         <div class="article">
             <h3>${data[key].name}</h3>
             <p>${data[key].schema.row.rowName}</p>
-            <button class="run">run💥</button>
+            <button class="run" data-key="${key}">run💥</button>
         </div>
         `;
         });
+        runScript();
       }
     });
   }
 });
+
+let runScript = () => {
+  let run = document.querySelectorAll(".run");
+  run.forEach(el =>
+    el.addEventListener("click", e => {
+      var obj = {
+        text: "run_script_from_popup",
+        ...storeValue[e.target.dataset.key]
+      };
+      runTimeSendMsg.send(obj);
+    })
+  );
+};
