@@ -12,6 +12,7 @@ let dsOption = new DesireOptionClassList();
 //receive massage 🚀
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
+  console.log(message);
   let _text = message.text;
   switch (_text) {
     case "create_iframe":
@@ -79,7 +80,11 @@ function gotMessage(message, sender) {
           });
           tableItem.push(obj);
         });
-        console.log(tableItem);
+        // console.log(tableItem);
+        sendMessage({
+          text: "data_table_from_popup",
+          tableItem
+        });
       }
       break;
   }

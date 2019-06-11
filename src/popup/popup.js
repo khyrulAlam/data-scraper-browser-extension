@@ -5,7 +5,7 @@ let runTimeSendMsg = new RunTimeSendMsg();
 //element selector
 let newSchema = document.querySelector("#newSchema");
 let homePage = document.querySelector("#homePage");
-// var console  = chrome.extension.getBackgroundPage().console;
+var console = chrome.extension.getBackgroundPage().console;
 
 // send message to content-script for new schema
 newSchema.addEventListener("click", e => {
