@@ -50,15 +50,24 @@ var popupScript = {
 
 var optionScript = {
   ...commonConfig,
-  entry: "./src/client/app.js",
+  entry: {
+    app: "./src/client/app.js",
+    "download-app": "./src/client/download/download-app.js"
+  },
   output: {
     path: path.resolve(__dirname, "app/client"),
-    filename: "app.js"
+    filename: "[name].js"
   },
   plugins: [
     new HtmlWebpackPlugin({
+      inject: false,
       filename: "index.html",
       template: "src/client/index.html"
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: "download.html",
+      template: "src/client/download/download.html"
     })
   ]
 };
