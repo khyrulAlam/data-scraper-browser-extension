@@ -131,7 +131,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  display: none;
+  visibility: visible;
 }
 .loader {
   border: 30px groove #4caf50;
@@ -146,4 +146,7 @@ body {
   to {
     transform: rotate(360deg);
   }
+}
+#dom_viewer {
+  visibility: hidden;
 }

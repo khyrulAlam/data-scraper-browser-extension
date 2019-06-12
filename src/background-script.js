@@ -15,18 +15,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, callback) {
         tabId = message.tabId;
       }
       break;
-    case "data_table_from_popup":
-      // console.log(message, sender);
+    case "create_download_tab":
       chrome.tabs.create({ url: "client/download.html" }, function(tab) {
-        console.log(tab);
         setTimeout(() => {
-          console.log(" ok send 🐄 ", tab.id, tabId);
           chrome.tabs.sendMessage(tab.id, {
-            text: "create_data_table",
+            text: "send_table_data_to_download_page",
             senderId: sender.tab.id,
-            ...message.tableItem
+            website_url: message.website_url,
+            tableItem: [...message.tableItem]
           });
-        }, 5000);
+        }, 3000);
       });
       break;
   }

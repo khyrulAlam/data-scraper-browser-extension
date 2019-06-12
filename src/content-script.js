@@ -12,7 +12,6 @@ let dsOption = new DesireOptionClassList();
 //receive massage 🚀
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
-  console.log(message);
   let _text = message.text;
   switch (_text) {
     case "create_iframe":
@@ -75,14 +74,17 @@ function gotMessage(message, sender) {
             obj[item.colName] =
               row.querySelector(item.colCls) &&
               row.querySelector(item.colCls).textContent
-                ? row.querySelector(item.colCls).textContent.trim()
+                ? row
+                    .querySelector(item.colCls)
+                    .textContent.replace(/\n/g, "")
+                    .trim()
                 : "";
           });
           tableItem.push(obj);
         });
-        // console.log(tableItem);
         sendMessage({
-          text: "data_table_from_popup",
+          text: "create_download_tab",
+          website_url: location.origin,
           tableItem
         });
       }
