@@ -1,4 +1,5 @@
 import { chromeId, schemaObj } from "./globalVar";
+import XLSX from "xlsx";
 var sTarget;
 var prevElementFlag;
 
@@ -279,5 +280,38 @@ export class StoreData {
         });
       });
     });
+  }
+}
+
+export class RandomId {
+  ID() {
+    return (
+      "joyBangla_" +
+      Math.random()
+        .toString(36)
+        .slice(8)
+    );
+  }
+}
+
+export class DownloaderHelper extends RandomId {
+  CreateTable(element, data) {
+    let ws = XLSX.utils.json_to_sheet(data);
+    let htmlString = XLSX.utils.sheet_to_html(ws, {
+      id: "data-table",
+      editable: false
+    });
+    element.innerHTML = htmlString;
+    document
+      .querySelector("#data-table")
+      .classList.add("table", "table-striped", "table-sm", "table-bordered");
+  }
+  Download(type, fn, dl) {
+    var elt = document.getElementById("data-table");
+    var wb = XLSX.utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
+    var name = this.ID();
+    return dl
+      ? XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" })
+      : XLSX.writeFile(wb, fn || name + "." + (type || "xlsx"));
   }
 }
