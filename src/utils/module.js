@@ -1,5 +1,5 @@
 import { chromeId, schemaObj } from "./globalVar";
-import XLSX from "xlsx";
+import { utils, write, writeFile } from "xlsx";
 var sTarget;
 var prevElementFlag;
 
@@ -296,8 +296,8 @@ export class RandomId {
 
 export class DownloaderHelper extends RandomId {
   CreateTable(element, data) {
-    let ws = XLSX.utils.json_to_sheet(data);
-    let htmlString = XLSX.utils.sheet_to_html(ws, {
+    let ws = utils.json_to_sheet(data);
+    let htmlString = utils.sheet_to_html(ws, {
       id: "data-table",
       editable: false
     });
@@ -308,10 +308,10 @@ export class DownloaderHelper extends RandomId {
   }
   Download(type, fn, dl) {
     var elt = document.getElementById("data-table");
-    var wb = XLSX.utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
+    var wb = utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
     var name = this.ID();
     return dl
-      ? XLSX.write(wb, { bookType: type, bookSST: true, type: "base64" })
-      : XLSX.writeFile(wb, fn || name + "." + (type || "xlsx"));
+      ? write(wb, { bookType: type, bookSST: true, type: "base64" })
+      : writeFile(wb, fn || name + "." + (type || "xlsx"));
   }
 }
