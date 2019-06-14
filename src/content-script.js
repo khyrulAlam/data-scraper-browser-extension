@@ -89,6 +89,31 @@ function gotMessage(message, sender) {
         });
       }
       break;
+      case "run_script_for_download":
+        tableItem = [];
+        var rows = document.querySelectorAll(message.schema.row.rowCls);
+        if (rows) {
+          rows.forEach(row => {
+            var obj = {};
+            message.schema.columns.map(item => {
+              obj[item.colName] =
+                row.querySelector(item.colCls) &&
+                row.querySelector(item.colCls).textContent
+                  ? row
+                      .querySelector(item.colCls)
+                      .textContent.replace(/\n/g, "")
+                      .trim()
+                  : "";
+            });
+            tableItem.push(obj);
+          });
+          sendMessage({
+            text: "new_data_send_to_download_page",
+            reciverId: message.senderId,
+            tableItem
+          })
+        }
+      break
   }
 }
 

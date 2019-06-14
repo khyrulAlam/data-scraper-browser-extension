@@ -4,6 +4,7 @@ import { DownloaderHelper } from "../../utils/module";
 let downloadHelper = new DownloaderHelper();
 let senderId = null;
 let storeValue = null;
+let tabId = null;
 //select element
 let isLoading = document.querySelector("#isLoading");
 let dom_viewer = document.querySelector("#dom_viewer");
@@ -11,18 +12,19 @@ let resultTable = document.querySelector("#result_table");
 let downloadData = document.querySelector("#download_data");
 let downloadOption = document.querySelector("#download_option");
 let schemaList = document.querySelector("#schema_list");
+let dataLoading = document.querySelector("#data_loading");
 
-// chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-//   console.log(tabs);
-// });
+chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+  tabId = tabs[0].id;
+});
 
 chrome.runtime.onMessage.addListener(gotMessage);
 
 function gotMessage(message, sender) {
-  senderId = message.senderId;
   let text = message.text;
   switch (text) {
     case "send_table_data_to_download_page":
+      senderId = message.senderId;
       schemaList.innerHTML += `<p class="text-center badge-warning">Website 👉 ${
         message.website_url
       }</p>`;
@@ -48,6 +50,12 @@ function gotMessage(message, sender) {
       isLoading.style.visibility = "hidden";
       dom_viewer.style.visibility = "visible";
       break;
+      case "new_download_data":
+        setTimeout(()=>{
+          dataLoading.style.display = "none";
+          downloadHelper.CreateTable(resultTable, message.tableItem);
+        },1000)
+      break
   }
 }
 
@@ -60,13 +68,18 @@ downloadData.addEventListener("click", () => {
   downloadHelper.Download(type);
 });
 
-//   chrome.tabs.sendMessage(senderId, { text: "message from other page" });
-
 let runScript = () => {
   let run = document.querySelectorAll(".run");
   run.forEach(el =>
     el.addEventListener("click", e => {
-      console.log(storeValue[e.target.dataset.key]);
+      resultTable.innerHTML = ""
+      dataLoading.style.display = "block";
+      var obj = {
+        text: "run_script_for_download",
+        senderId: tabId,
+        ...storeValue[e.target.dataset.key]
+      };
+      chrome.tabs.sendMessage(senderId, obj);
     })
   );
 };

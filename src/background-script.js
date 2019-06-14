@@ -10,7 +10,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, callback) {
           chrome.tabs.sendMessage(tabId, { text: "remove_iframe" });
           tabId = message.tabId;
         }
-        console.log(message.tabId, "old", tabId);
       } else {
         tabId = message.tabId;
       }
@@ -26,6 +25,12 @@ chrome.runtime.onMessage.addListener(function(message, sender, callback) {
           });
         }, 3000);
       });
+      break;
+      case "new_data_send_to_download_page":
+        chrome.tabs.sendMessage(message.reciverId,{
+          text: "new_download_data",
+          tableItem:[...message.tableItem]
+        })
       break;
   }
 });

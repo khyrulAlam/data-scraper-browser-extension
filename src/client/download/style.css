@@ -164,6 +164,7 @@ body {
 #schema_list .article h3 {
   margin-bottom: 3px;
   text-transform: capitalize;
+  font-size: 18px;
 }
 #schema_list .article .run {
   color: #86901d;
@@ -179,3 +180,16 @@ body {
   text-transform: capitalize;
   cursor: pointer;
 }
+#data_loading{
+  height: 40px;
+  width: 40px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 1px solid #fec239;
+  border-top: 2px solid #fff;
+  animation: spinner1 600ms linear infinite;
+  display: none;
+} 
+@keyframes spinner1 { 
+  to { transform: rotate(360deg);} 
+} 
