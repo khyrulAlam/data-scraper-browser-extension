@@ -10,32 +10,11 @@
 
 ## Features
 
-<dl>
-  <dt>One Click Scraping</dt>
-  <dd>
-    ....
-  </dd>
-</dl>
-
-<dl>
-  <dt>Make your own Scraping Schema</dt>
-  <dd> ... </dd>
-</dl>
-
-<dl>
-  <dt>Text, URL, and HTML Data</dt>
-  <dd>....</dd>
-</dl>
-
-<dl>
-  <dt>Download in Excel and CSV format</dt>
-  <dd>....</dd>
-</dl>
-
-<dl>
-  <dt>Save our own Schema</dt>
-  <dd>....</dd>
-</dl>
+1. Make your own Scraping Schema
+2. Text, URL, and HTML Data
+3. Download in Excel and CSV format
+4. Save our own Schema
+5. One Click Scraping
 
 ## Installation
 
