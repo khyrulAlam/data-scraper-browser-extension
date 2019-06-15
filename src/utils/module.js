@@ -113,6 +113,13 @@ export class ElementsCreateUtility {
     element.innerHTML = `<div class="col-12">
         <input type="text" class="form-control" name="colName" placeholder="Column Name">
       </div>
+      <div class="col-12">
+          <select name="contentType" class="form-control">
+              <option value="text">Text</option>
+              <option value="url">URL</option>
+              <option value="html">HTML</option>
+          </select>
+      </div>
       <div class="col-9">
           <input type="text" class="form-control" name="colCls" placeholder="Class Name">
       </div>
@@ -246,7 +253,9 @@ export class InputCheckList extends RunTimeSendMsg {
         ? parentEl.querySelector("input[name=colName]").value
         : "colName";
       let colCls = parentEl.querySelector("input[name=colCls]").value;
-      schemaObj.schema.columns.push({ colName, colCls });
+      let contentType = parentEl.querySelector("select[name=contentType]")
+        .value;
+      schemaObj.schema.columns.push({ colName, colCls, contentType });
       e.target.parentElement.innerHTML = "";
     });
   }
