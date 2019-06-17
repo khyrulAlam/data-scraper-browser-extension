@@ -168,6 +168,9 @@ function gotMessage(message, sender) {
         });
       }
       break;
+    case "save_schema":
+      dsOption.removeSelectedClass();
+      break;
   }
 }
 

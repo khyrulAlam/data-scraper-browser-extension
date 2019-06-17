@@ -35,6 +35,13 @@ export class DesireOptionClassList {
     });
     prevElementFlag = element;
   }
+  removeSelectedClass() {
+    if (prevElementFlag) {
+      prevElementFlag.forEach(el => {
+        el.style.outline = "none";
+      });
+    }
+  }
 }
 
 export class IframeElement {

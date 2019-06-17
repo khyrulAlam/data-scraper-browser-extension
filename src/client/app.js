@@ -119,6 +119,10 @@ saveSchema.addEventListener("click", function() {
     let store = new StoreData(tab.url);
     if (schemaObj.name != "") {
       store.saveData(schemaObj);
+      let msg = {
+        text: "save_schema"
+      };
+      runtimeSendMessage.send(msg);
       setTimeout(() => {
         runtimeSendMessage.send({ text: "remove_iframe" });
       }, 200);
