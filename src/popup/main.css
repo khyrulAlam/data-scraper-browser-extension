@@ -112,3 +112,18 @@ body {
   cursor: pointer;
   box-shadow: 0 0 10px 4px rgba(0, 0, 0, 0.12);
 }
+.loading {
+  height: 40px;
+  width: 40px;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 1px solid #fec239;
+  border-top: 2px solid #fff;
+  animation: spinner1 600ms linear infinite;
+  display: none;
+}
+@keyframes spinner1 {
+  to {
+    transform: rotate(360deg);
+  }
+}

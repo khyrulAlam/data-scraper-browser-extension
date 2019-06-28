@@ -11,7 +11,8 @@ let _appWrapper = document.querySelector("#app-wrapper");
 
 const makeSignupDom = () => {
   _signup.innerHTML = `<div class="signup-wrapper">
-  <button>
+  <span class="loading"></span>
+  <button id="googleSignUp">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48"
           class="abcRioButtonSvg">
           <g>
@@ -33,6 +34,15 @@ const makeSignupDom = () => {
       Sign in with Google
   </button>
 </div>`;
+  let _googleSignUp = document.querySelector("#googleSignUp");
+  let _loading = document.querySelector(".loading");
+  _googleSignUp.addEventListener("click", () => {
+    _loading.style.display = "block";
+    _googleSignUp.style.display = "none";
+    chrome.identity.getAuthToken({ interactive: true }, function(access_token) {
+      console.log(access_token);
+    });
+  });
 };
 
 let appWrapperDom = () => {
@@ -75,14 +85,30 @@ let appEventStart = () => {
 
 //runtime check. Is there is any schema on chrome storage
 if (!localStorage.getItem("_gId")) {
-  makeSignupDom();
-  // chrome.identity.getAuthToken(function(access_token) {
-  //   if (chrome.runtime.lastError) {
-  //     console.log(chrome.runtime.lastError);
-  //     return;
-  //   }
-  //   console.log(access_token);
-  // });
+  chrome.identity.getAuthToken(function(access_token) {
+    if (chrome.runtime.lastError) {
+      console.log("autho error", chrome.runtime.lastError);
+      makeSignupDom();
+      return;
+    }
+    console.log(access_token);
+    let url = "http://localhost:3000/user";
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        token: access_token
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        localStorage.setItem("_gId", res._gId);
+      });
+  });
 } else {
   appWrapperDom();
   appEventStart();
