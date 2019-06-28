@@ -40,7 +40,7 @@ const makeSignupDom = () => {
     _loading.style.display = "block";
     _googleSignUp.style.display = "none";
     chrome.identity.getAuthToken({ interactive: true }, function(access_token) {
-      console.log(access_token);
+      // console.log(access_token);
     });
   });
 };
@@ -83,33 +83,20 @@ let appEventStart = () => {
   });
 };
 
-//runtime check. Is there is any schema on chrome storage
-if (!localStorage.getItem("_gId")) {
-  chrome.identity.getAuthToken(function(access_token) {
-    if (chrome.runtime.lastError) {
-      console.log("autho error", chrome.runtime.lastError);
-      makeSignupDom();
-      return;
-    }
-    console.log(access_token);
-    let url = "http://localhost:3000/user";
-    fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        token: access_token
-      })
+let runScript = () => {
+  let run = document.querySelectorAll(".run");
+  run.forEach(el =>
+    el.addEventListener("click", e => {
+      var obj = {
+        text: "run_script_from_popup",
+        ...storeValue[e.target.dataset.key]
+      };
+      runTimeSendMsg.send(obj);
     })
-      .then(res => res.json())
-      .then(res => {
-        console.log(res);
-        localStorage.setItem("_gId", res._gId);
-      });
-  });
-} else {
+  );
+};
+
+let appStart = () => {
   appWrapperDom();
   appEventStart();
   chrome.tabs.query(tabParams, function(tabs) {
@@ -137,17 +124,33 @@ if (!localStorage.getItem("_gId")) {
       });
     }
   });
-}
-
-let runScript = () => {
-  let run = document.querySelectorAll(".run");
-  run.forEach(el =>
-    el.addEventListener("click", e => {
-      var obj = {
-        text: "run_script_from_popup",
-        ...storeValue[e.target.dataset.key]
-      };
-      runTimeSendMsg.send(obj);
-    })
-  );
 };
+
+//runtime check. Is there is any schema on chrome storage
+if (!localStorage.getItem("_gId")) {
+  chrome.identity.getAuthToken(function(access_token) {
+    if (chrome.runtime.lastError) {
+      console.log("autho error", chrome.runtime.lastError);
+      makeSignupDom();
+      return;
+    }
+    appStart();
+    let url = "http://localhost:3000/user";
+    fetch(url, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        token: access_token
+      })
+    })
+      .then(res => res.json())
+      .then(res => {
+        localStorage.setItem("_gId", res._gId);
+      });
+  });
+} else {
+  appStart();
+}
