@@ -133,7 +133,7 @@ export class ElementsCreateUtility {
       <div class="col-3">
           <button type="button" class="btn btn-primary mouseMove-col" data-col="colNum${
             this.count
-          }">Drag</button>
+          }">🖱</button>
       </div>
       <div class="class-checkbox-dom">
       </div>

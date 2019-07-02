@@ -18,9 +18,9 @@
 
 ## Installation
 
-1. Clone the repository `git clone https://github.com/EmailThis/extension-boilerplate.git`
+1. Clone the repository `git clone https://github.com/khyrulAlam/data-scraper-browser-extension.git`
 2. Run `npm install`
-3. Run `npm run build`
+3. Run `npm run build:prod`
 
 ##### Load the extension in Chrome & Opera
 
@@ -31,8 +31,8 @@
 ## TODO
 
 - [ ] Add support for Safari, Firefox & Opera
-- [ ] Add authentication
-- [ ] Improve UI/UX
+- [x] Add authentication
+- [x] Improve UI/UX
 
 ---
 

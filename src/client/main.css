@@ -19,3 +19,9 @@ body {
 hr {
   border-top: 1px dashed rgb(0, 0, 0);
 }
+p {
+  font-size: 14px;
+  line-height: initial;
+  padding-top: 6px;
+  color: #e91e63;
+}
