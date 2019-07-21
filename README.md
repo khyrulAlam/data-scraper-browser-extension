@@ -33,6 +33,7 @@
 - [ ] Add support for Safari, Firefox & Opera
 - [x] Add authentication
 - [x] Improve UI/UX
+- [ ] Lookup button (looking for parent element ClassName or Id)
 
 ---
 
