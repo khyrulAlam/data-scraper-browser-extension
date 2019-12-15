@@ -12,6 +12,9 @@ let dsOption = new DesireOptionClassList();
 //receive massage 🚀
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
+  console.group("message");
+  console.log(message);
+  console.groupEnd();
   let _text = message.text;
   switch (_text) {
     case "create_iframe":
@@ -41,6 +44,24 @@ function gotMessage(message, sender) {
       } else {
         let elements = document.querySelectorAll(`.${message.clsName.name}`);
         dsOption.markSelectedClass(elements);
+      }
+      break;
+    case "parent_lookup":
+      let dsSelected = document.querySelector(".ds_selected");
+
+      if (dsSelected) {
+        dsSelected.classList.remove("ds_selected");
+        let lookupClass = dsSelected.parentElement;
+        lookupClass.classList.add("ds_selected");
+        let msg = {
+          text: "class_lists",
+          ref: message.ref,
+          lists: {
+            attributes: [...lookupClass["classList"]],
+            element: lookupClass.localName
+          }
+        };
+        sendMessage(msg);
       }
       break;
     case "run_script":

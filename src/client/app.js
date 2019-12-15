@@ -89,13 +89,13 @@ function gotMessage(message, sender) {
     if (message.ref === "row_name") {
       let checkboxDom = document.querySelector(".checkbox-dom");
       let inputBox = new InputCheckList(checkboxDom, message.lists);
-      inputBox.makeCheckBox();
+      inputBox.makeCheckBox(message.ref);
       inputBox.selectClass();
     } else {
       let sec = document.querySelector(`.${message.ref}`);
       let checkboxDom = sec.querySelector(".class-checkbox-dom");
       let inputBox = new InputCheckList(checkboxDom, message.lists);
-      inputBox.makeCheckBox();
+      inputBox.makeCheckBox(message.ref);
       inputBox.selectClassForCol(sec);
     }
   }

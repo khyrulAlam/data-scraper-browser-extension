@@ -1,5 +1,5 @@
 import { chromeId, schemaObj } from "./globalVar";
-import { utils, write, writeFile } from "xlsx";
+// import { utils, write, writeFile } from "xlsx";
 var sTarget;
 var prevElementFlag;
 
@@ -19,8 +19,12 @@ export class DesireOptionClassList {
     this.element = "";
   }
   getList() {
+    let isPrevSelected = document.querySelector(".ds_selected");
+    if (isPrevSelected) isPrevSelected.classList.remove("ds_selected");
+    let attributesLists = [...sTarget["classList"]];
+    sTarget.classList.add("ds_selected");
     return {
-      attributes: [...sTarget["classList"]],
+      attributes: attributesLists,
       element: sTarget.localName
     };
   }
@@ -131,11 +135,9 @@ export class ElementsCreateUtility {
           <input type="text" class="form-control" name="colCls" placeholder="Class Name">
       </div>
       <div class="col-3">
-          <button type="button" class="btn btn-primary mouseMove-col" data-col="colNum${
-            this.count
-          }">🖱</button>
+          <button type="button" class="btn btn-primary mouseMove-col" data-col="colNum${this.count}">🖱</button>
       </div>
-      <div class="class-checkbox-dom">
+      <div class="col-12 class-checkbox-dom">
       </div>
     </div>`;
   }
@@ -181,7 +183,7 @@ export class InputCheckList extends RunTimeSendMsg {
     this.lists = lists;
     this.element.innerHTML = "";
   }
-  makeCheckBox() {
+  makeCheckBox(ref) {
     if (this.lists.attributes && this.lists.attributes.length === 0) {
       let obj = {
         name: this.lists.element,
@@ -195,7 +197,17 @@ export class InputCheckList extends RunTimeSendMsg {
         ${this.lists.element}
       </label>
     </div>`;
-      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-4" id="doneSelect">Done</button>`;
+      this.element.innerHTML += `
+        <div class="mt-2 p-2" style="border: solid 1px #17a2b840;">
+          <button type="button" class="btn btn-outline-info btn-sm" id="lookup_parent" data-lookfor="${this.lists.attributes[0]}" data-ref="${ref}">⇯ Parent ⇯</button>
+          <div class="pt-2 mt-3" style="border-top: 1px solid #0000002b;">
+            Choose Sibling-  
+            <button type="button" class="btn btn-outline-info btn-sm">⏶</button>
+            <button type="button" class="btn btn-outline-info btn-sm">⏷</button>
+          </div>
+        </div>
+      `;
+      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-3" id="doneSelect">Done</button>`;
     } else {
       this.lists.attributes.forEach(cls => {
         let obj = {
@@ -211,7 +223,17 @@ export class InputCheckList extends RunTimeSendMsg {
         </label>
       </div>`;
       });
-      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-4" id="doneSelect">Done</button>`;
+      this.element.innerHTML += `
+        <div class="mt-2 p-2" style="border: solid 1px #17a2b840;">
+          <button type="button" class="btn btn-outline-info btn-sm" id="lookup_parent" data-lookfor="${this.lists.attributes[0]}" data-ref="${ref}">⇯ Parent ⇯</button>
+          <div class="pt-2 mt-3" style="border-top: 1px solid #0000002b;">
+            Choose Sibling-  
+            <button type="button" class="btn btn-outline-info btn-sm">⏶</button>
+            <button type="button" class="btn btn-outline-info btn-sm">⏷</button>
+          </div>
+        </div>
+      `;
+      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-3" id="doneSelect">Done</button>`;
     }
   }
   selectClass() {
@@ -239,6 +261,17 @@ export class InputCheckList extends RunTimeSendMsg {
       schemaObj.schema["row"] = { rowName, rowCls };
       e.target.parentElement.innerHTML = "";
     });
+    let lookup_parent = document.querySelector("#lookup_parent");
+    lookup_parent.addEventListener("click", e => {
+      let lookupFor = e.target.dataset.lookfor;
+      let ref = e.target.dataset.ref;
+      let msg = {
+        text: "parent_lookup",
+        clsName: lookupFor,
+        ref
+      };
+      this.send(msg);
+    });
   }
   selectClassForCol(parentEl) {
     this.element.addEventListener("change", e => {
@@ -264,6 +297,17 @@ export class InputCheckList extends RunTimeSendMsg {
         .value;
       schemaObj.schema.columns.push({ colName, colCls, contentType });
       e.target.parentElement.innerHTML = "";
+    });
+    let lookup_parent = document.querySelector("#lookup_parent");
+    lookup_parent.addEventListener("click", e => {
+      let lookupFor = e.target.dataset.lookfor;
+      let ref = e.target.dataset.ref;
+      let msg = {
+        text: "parent_lookup",
+        clsName: lookupFor,
+        ref
+      };
+      this.send(msg);
     });
   }
 }
@@ -312,22 +356,22 @@ export class RandomId {
 
 export class DownloaderHelper extends RandomId {
   CreateTable(element, data) {
-    let ws = utils.json_to_sheet(data);
-    let htmlString = utils.sheet_to_html(ws, {
-      id: "data-table",
-      editable: false
-    });
-    element.innerHTML = htmlString;
-    document
-      .querySelector("#data-table")
-      .classList.add("table", "table-striped", "table-sm", "table-bordered");
+    // let ws = utils.json_to_sheet(data);
+    // let htmlString = utils.sheet_to_html(ws, {
+    //   id: "data-table",
+    //   editable: false
+    // });
+    // element.innerHTML = htmlString;
+    // document
+    //   .querySelector("#data-table")
+    //   .classList.add("table", "table-striped", "table-sm", "table-bordered");
   }
   Download(type, fn, dl) {
-    var elt = document.getElementById("data-table");
-    var wb = utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
-    var name = this.ID();
-    return dl
-      ? write(wb, { bookType: type, bookSST: true, type: "base64" })
-      : writeFile(wb, fn || name + "." + (type || "xlsx"));
+    //   var elt = document.getElementById("data-table");
+    //   var wb = utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
+    //   var name = this.ID();
+    //   return dl
+    //     ? write(wb, { bookType: type, bookSST: true, type: "base64" })
+    //     : writeFile(wb, fn || name + "." + (type || "xlsx"));
   }
 }
