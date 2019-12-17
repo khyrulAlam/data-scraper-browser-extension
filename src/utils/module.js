@@ -199,19 +199,20 @@ export class InputCheckList extends RunTimeSendMsg {
     </div>`;
       this.element.innerHTML += `
         <div class="mt-2 p-2" style="border: solid 1px #17a2b840;">
-          <button type="button" class="btn btn-outline-info btn-sm" id="lookup_parent" data-lookfor="${this.lists.attributes[0]}" data-ref="${ref}">⇯ Parent ⇯</button>
+          <button type="button" class="btn btn-outline-info btn-sm" id="lookup_parent" data-lookfor="${this.lists.element}" data-ref="${ref}">⇯ Parent ⇯</button>
           <div class="pt-2 mt-3" style="border-top: 1px solid #0000002b;">
             Choose Sibling-  
-            <button type="button" class="btn btn-outline-info btn-sm">⏶</button>
-            <button type="button" class="btn btn-outline-info btn-sm">⏷</button>
+            <button type="button" id="sibling-up" class="btn btn-outline-info btn-sm">⏶</button>
+            <button type="button" id="sibling-down" class="btn btn-outline-info btn-sm">⏷</button>
+            eq-<span id="sibling-index" data-sibling="${this.lists.element}"></span>
           </div>
         </div>
       `;
-      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-3" id="doneSelect">Done</button>`;
+      this.element.innerHTML += `<button type="button" class="btn btn-outline-warning mt-3" id="doneSelect">Done</button>`;
     } else {
       this.lists.attributes.forEach(cls => {
         let obj = {
-          name: cls,
+          name: `.${cls}`,
           isElement: false
         };
         this.element.innerHTML += `<div class="form-check">
@@ -228,24 +229,21 @@ export class InputCheckList extends RunTimeSendMsg {
           <button type="button" class="btn btn-outline-info btn-sm" id="lookup_parent" data-lookfor="${this.lists.attributes[0]}" data-ref="${ref}">⇯ Parent ⇯</button>
           <div class="pt-2 mt-3" style="border-top: 1px solid #0000002b;">
             Choose Sibling-  
-            <button type="button" class="btn btn-outline-info btn-sm">⏶</button>
-            <button type="button" class="btn btn-outline-info btn-sm">⏷</button>
+            <button type="button" id="sibling-up" class="btn btn-outline-info btn-sm">⏶</button>
+            <button type="button" id="sibling-down" class="btn btn-outline-info btn-sm">⏷</button>
+            <span id="sibling-index" data-sibling=".${this.lists.attributes[0]}"></span>
           </div>
         </div>
       `;
-      this.element.innerHTML += `<button type="button" class="btn btn-warning mt-3" id="doneSelect">Done</button>`;
+      this.element.innerHTML += `<button type="button" class="btn btn-outline-warning mt-3" id="doneSelect">Done</button>`;
     }
   }
   selectClass() {
+    let rowCls = document.querySelector("input[name=rowCls]");
     this.element.addEventListener("change", e => {
       let val = document.querySelector("input[name=cls]:checked").value;
-      let rowCls = document.querySelector("input[name=rowCls]");
       let clsName = JSON.parse(decodeURIComponent(val));
-      if (clsName.isElement) {
-        rowCls.value = clsName.name;
-      } else {
-        rowCls.value = "." + clsName.name;
-      }
+      rowCls.value = clsName.name;
       let msg = {
         text: "mark_element",
         clsName
@@ -260,27 +258,18 @@ export class InputCheckList extends RunTimeSendMsg {
       let rowCls = document.querySelector("input[name=rowCls]").value;
       schemaObj.schema["row"] = { rowName, rowCls };
       e.target.parentElement.innerHTML = "";
+      console.log(schemaObj);
     });
-    let lookup_parent = document.querySelector("#lookup_parent");
-    lookup_parent.addEventListener("click", e => {
-      let lookupFor = e.target.dataset.lookfor;
-      let ref = e.target.dataset.ref;
-      let msg = {
-        text: "parent_lookup",
-        clsName: lookupFor,
-        ref
-      };
-      this.send(msg);
-    });
+    this.lookupParent();
+    this.lookupSibling(rowCls);
   }
   selectClassForCol(parentEl) {
+    let colClass = parentEl.querySelector("input[name=colCls]");
     this.element.addEventListener("change", e => {
       let val = this.element.querySelector("input[name=cls]:checked").value;
-      let colClass = parentEl.querySelector("input[name=colCls]");
       let clsName = JSON.parse(decodeURIComponent(val));
-      clsName.isElement
-        ? (colClass.value = clsName.name)
-        : (colClass.value = "." + clsName.name);
+      colClass.value = clsName.name;
+      clsName.name = `${schemaObj.schema.row.rowCls} ${clsName.name}`;
       let msg = {
         text: "mark_element",
         clsName
@@ -297,7 +286,13 @@ export class InputCheckList extends RunTimeSendMsg {
         .value;
       schemaObj.schema.columns.push({ colName, colCls, contentType });
       e.target.parentElement.innerHTML = "";
+      console.log(schemaObj);
     });
+    this.lookupParent();
+    this.lookupSibling(colClass);
+  }
+
+  lookupParent() {
     let lookup_parent = document.querySelector("#lookup_parent");
     lookup_parent.addEventListener("click", e => {
       let lookupFor = e.target.dataset.lookfor;
@@ -308,6 +303,55 @@ export class InputCheckList extends RunTimeSendMsg {
         ref
       };
       this.send(msg);
+    });
+  }
+
+  lookupSibling(inputEl) {
+    let siblingUp = document.querySelector("#sibling-up");
+    let siblingDown = document.querySelector("#sibling-down");
+    let siblingIndex = document.querySelector("#sibling-index");
+    let siblingLookupFor = siblingIndex.dataset.sibling;
+
+    siblingUp.addEventListener("click", () => {
+      let index = siblingIndex.innerText;
+      if (index === "") {
+        siblingIndex.innerText = 0;
+        inputEl.value = `${siblingLookupFor}-eq(${0})`;
+      } else {
+        siblingIndex.innerText = Number(index) + 1;
+        inputEl.value = `${siblingLookupFor}-eq(${Number(index) + 1})`;
+        let msg = {
+          text: "sibling_lookup",
+          elementRef: {
+            element: siblingLookupFor,
+            indexNum: Number(index) + 1,
+            prevIndexNum: Number(index)
+          }
+        };
+        this.send(msg);
+      }
+    });
+
+    siblingDown.addEventListener("click", () => {
+      let index = Number(siblingIndex.innerText);
+      if (index === "") {
+        siblingIndex.innerText = "";
+      } else if (index === 0) {
+        siblingIndex.innerText = "";
+        inputEl.value = "";
+      } else {
+        siblingIndex.innerText = Number(index) - 1;
+        inputEl.value = `${siblingLookupFor}-eq(${Number(index) - 1})`;
+        let msg = {
+          text: "sibling_lookup",
+          elementRef: {
+            element: siblingLookupFor,
+            indexNum: Number(index) - 1,
+            prevIndexNum: Number(index)
+          }
+        };
+        this.send(msg);
+      }
     });
   }
 }

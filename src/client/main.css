@@ -25,3 +25,7 @@ p {
   padding-top: 6px;
   color: #e91e63;
 }
+.form-row {
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #ffc108;
+}

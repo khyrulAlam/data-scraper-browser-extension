@@ -38,13 +38,8 @@ function gotMessage(message, sender) {
       });
       break;
     case "mark_element":
-      if (message.clsName.isElement) {
-        let elements = document.querySelectorAll(`${message.clsName.name}`);
-        dsOption.markSelectedClass(elements);
-      } else {
-        let elements = document.querySelectorAll(`.${message.clsName.name}`);
-        dsOption.markSelectedClass(elements);
-      }
+      let elements = document.querySelectorAll(`${message.clsName.name}`);
+      dsOption.markSelectedClass(elements);
       break;
     case "parent_lookup":
       let dsSelected = document.querySelector(".ds_selected");
@@ -52,16 +47,29 @@ function gotMessage(message, sender) {
       if (dsSelected) {
         dsSelected.classList.remove("ds_selected");
         let lookupClass = dsSelected.parentElement;
+        let attributesLists = [...lookupClass["classList"]];
         lookupClass.classList.add("ds_selected");
         let msg = {
           text: "class_lists",
           ref: message.ref,
           lists: {
-            attributes: [...lookupClass["classList"]],
+            attributes: attributesLists,
             element: lookupClass.localName
           }
         };
         sendMessage(msg);
+      }
+      break;
+    case "sibling_lookup":
+      let prevEl = document.querySelectorAll(`${message.elementRef.element}`)[
+        message.elementRef.prevIndexNum
+      ];
+      let el = document.querySelectorAll(`${message.elementRef.element}`)[
+        message.elementRef.indexNum
+      ];
+      if (el) {
+        el.style.outline = "5px solid #ffc107";
+        prevEl.style.outline = "";
       }
       break;
     case "run_script":
