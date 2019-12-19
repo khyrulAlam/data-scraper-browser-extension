@@ -74,37 +74,29 @@ function gotMessage(message, sender) {
       break;
     case "run_script":
       tableItem = [];
-      var rows = document.querySelectorAll(message.schema.row.rowCls);
+      var rows;
+
+      if (message.schema.row.rowCls.includes("eq")) {
+        let cResult = getSiblingIndex(message.schema.row.rowCls);
+        rows = document.querySelectorAll(cResult.className)[
+          cResult.indexNumber
+        ];
+      } else {
+        rows = document.querySelectorAll(message.schema.row.rowCls);
+      }
+
       if (rows) {
-        rows.forEach(row => {
-          var obj = {};
-          message.schema.columns.map(item => {
-            if (item.contentType === "text") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).textContent
-                  ? row.querySelector(item.colCls).textContent
-                  : "";
-            } else if (item.contentType === "url") {
-              let elCol = row.querySelector(item.colCls);
-              if (elCol.tagName !== "A") {
-                obj[item.colName] =
-                  elCol.querySelector("a") && elCol.querySelector("a").href
-                    ? elCol.querySelector("a").href
-                    : "";
-              } else {
-                obj[item.colName] = elCol && elCol.href ? elCol.href : "";
-              }
-            } else if (item.contentType === "html") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).innerHTML
-                  ? row.querySelector(item.colCls).innerHTML
-                  : "";
-            }
+        if (rows.length >= 0) {
+          scrapDataFromSchema(rows, message.schema.columns).then(res => {
+            tableItem = res;
           });
-          tableItem.push(obj);
-        });
+        } else {
+          scrapDataFromSchemaForSingleRow(rows, message.schema.columns).then(
+            res => {
+              tableItem = [res];
+            }
+          );
+        }
         sendMessage({
           text: "data_table",
           tableItem
@@ -112,89 +104,67 @@ function gotMessage(message, sender) {
       }
       break;
     case "run_script_from_popup":
-      tableItem = [];
-      var rows = document.querySelectorAll(message.schema.row.rowCls);
+      var rows;
+      if (message.schema.row.rowCls.includes("eq")) {
+        let cResult = getSiblingIndex(message.schema.row.rowCls);
+        rows = document.querySelectorAll(cResult.className)[
+          cResult.indexNumber
+        ];
+      } else {
+        rows = document.querySelectorAll(message.schema.row.rowCls);
+      }
       if (rows) {
-        rows.forEach(row => {
-          var obj = {};
-          message.schema.columns.map(item => {
-            if (item.contentType === "text") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).textContent
-                  ? row
-                      .querySelector(item.colCls)
-                      .textContent.replace(/\n/g, "")
-                      .trim()
-                  : "";
-            } else if (item.contentType === "url") {
-              let elCol = row.querySelector(item.colCls);
-              if (elCol.tagName !== "A") {
-                obj[item.colName] =
-                  elCol.querySelector("a") && elCol.querySelector("a").href
-                    ? elCol.querySelector("a").href
-                    : "";
-              } else {
-                obj[item.colName] = elCol && elCol.href ? elCol.href : "";
-              }
-            } else if (item.contentType === "html") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).innerHTML
-                  ? row.querySelector(item.colCls).innerHTML
-                  : "";
-            }
+        if (rows.length >= 0) {
+          scrapDataFromSchema(rows, message.schema.columns).then(res => {
+            sendMessage({
+              text: "create_download_tab",
+              website_url: location.origin,
+              tableItem: res
+            });
           });
-          tableItem.push(obj);
-        });
-        sendMessage({
-          text: "create_download_tab",
-          website_url: location.origin,
-          tableItem
-        });
+        } else {
+          scrapDataFromSchemaForSingleRow(rows, message.schema.columns).then(
+            res => {
+              sendMessage({
+                text: "create_download_tab",
+                website_url: location.origin,
+                tableItem: [res]
+              });
+            }
+          );
+        }
       }
       break;
     case "run_script_for_download":
-      tableItem = [];
-      var rows = document.querySelectorAll(message.schema.row.rowCls);
+      var rows;
+      if (message.schema.row.rowCls.includes("eq")) {
+        let cResult = getSiblingIndex(message.schema.row.rowCls);
+        rows = document.querySelectorAll(cResult.className)[
+          cResult.indexNumber
+        ];
+      } else {
+        rows = document.querySelectorAll(message.schema.row.rowCls);
+      }
       if (rows) {
-        rows.forEach(row => {
-          var obj = {};
-          message.schema.columns.map(item => {
-            if (item.contentType === "text") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).textContent
-                  ? row
-                      .querySelector(item.colCls)
-                      .textContent.replace(/\n/g, "")
-                      .trim()
-                  : "";
-            } else if (item.contentType === "url") {
-              let elCol = row.querySelector(item.colCls);
-              if (elCol.tagName !== "A") {
-                obj[item.colName] =
-                  elCol.querySelector("a") && elCol.querySelector("a").href
-                    ? elCol.querySelector("a").href
-                    : "";
-              } else {
-                obj[item.colName] = elCol && elCol.href ? elCol.href : "";
-              }
-            } else if (item.contentType === "html") {
-              obj[item.colName] =
-                row.querySelector(item.colCls) &&
-                row.querySelector(item.colCls).innerHTML
-                  ? row.querySelector(item.colCls).innerHTML
-                  : "";
-            }
+        if (rows.length >= 0) {
+          scrapDataFromSchema(rows, message.schema.columns).then(res => {
+            sendMessage({
+              text: "new_data_send_to_download_page",
+              reciverId: message.senderId,
+              tableItem: res
+            });
           });
-          tableItem.push(obj);
-        });
-        sendMessage({
-          text: "new_data_send_to_download_page",
-          reciverId: message.senderId,
-          tableItem
-        });
+        } else {
+          scrapDataFromSchemaForSingleRow(rows, message.schema.columns).then(
+            res => {
+              sendMessage({
+                text: "new_data_send_to_download_page",
+                reciverId: message.senderId,
+                tableItem: [res]
+              });
+            }
+          );
+        }
       }
       break;
     case "save_schema":
@@ -205,4 +175,122 @@ function gotMessage(message, sender) {
 
 const sendMessage = msg => {
   chrome.runtime.sendMessage(msg);
+};
+
+const getSiblingIndex = cnStr => {
+  let splitStr = cnStr.split("-eq(");
+  let className = splitStr[0];
+  let indexNumber = Number(splitStr[1].replace(/\)/, ""));
+  return {
+    className,
+    indexNumber
+  };
+};
+
+const scrapDataFromSchema = async (rows, columns) => {
+  let result = [];
+  rows.forEach(row => {
+    var obj = {};
+    columns.map(item => {
+      if (item.contentType === "text") {
+        if (item.colCls.includes("eq")) {
+          var cResult = getSiblingIndex(item.colCls);
+          obj[item.colName] =
+            row.querySelectorAll(cResult.className)[cResult.indexNumber] &&
+            row.querySelectorAll(cResult.className)[cResult.indexNumber]
+              .textContent
+              ? row
+                  .querySelectorAll(cResult.className)
+                  [cResult.indexNumber].textContent.replace(/\n/g, "")
+                  .trim()
+              : "";
+        } else {
+          obj[item.colName] =
+            row.querySelector(item.colCls) &&
+            row.querySelector(item.colCls).textContent
+              ? row
+                  .querySelector(item.colCls)
+                  .textContent.replace(/\n/g, "")
+                  .trim()
+              : "";
+        }
+      } else if (item.contentType === "url") {
+        let elCol;
+        if (item.colCls.includes("eq")) {
+          var cResult = getSiblingIndex(item.colCls);
+          elCol = row.querySelectorAll(cResult.className)[cResult.indexNumber];
+        } else {
+          elCol = row.querySelector(item.colCls);
+        }
+        if (elCol.tagName !== "A") {
+          obj[item.colName] =
+            elCol.querySelector("a") && elCol.querySelector("a").href
+              ? elCol.querySelector("a").href
+              : "";
+        } else {
+          obj[item.colName] = elCol && elCol.href ? elCol.href : "";
+        }
+      } else if (item.contentType === "html") {
+        let elHtml;
+        if (item.colCls.includes("eq")) {
+          var cResult = getSiblingIndex(item.colCls);
+          elHtml = row.querySelectorAll(cResult.className)[cResult.indexNumber];
+        } else {
+          elHtml = row.querySelector(item.colCls);
+        }
+        obj[item.colName] = elHtml && elHtml.innerHTML ? elHtml.innerHTML : "";
+      }
+    });
+    result.push(obj);
+  });
+  return result;
+};
+
+const scrapDataFromSchemaForSingleRow = async (rows, columns) => {
+  var obj = {};
+  columns.map(item => {
+    if (item.contentType === "text") {
+      if (item.colCls.includes("eq")) {
+        var cResult = getSiblingIndex(item.colCls);
+        obj[item.colName] =
+          rows.querySelector(cResult.className)[cResult.indexNumber] &&
+          rows.querySelector(cResult.className)[cResult.indexNumber].textContent
+            ? rows.querySelector(cResult.className)[cResult.indexNumber]
+                .textContent
+            : "";
+      } else {
+        obj[item.colName] =
+          rows.querySelector(item.colCls) &&
+          rows.querySelector(item.colCls).textContent
+            ? rows.querySelector(item.colCls).textContent
+            : "";
+      }
+    } else if (item.contentType === "url") {
+      let elCol;
+      if (item.colCls.includes("eq")) {
+        var cResult = getSiblingIndex(item.colCls);
+        elCol = rows.querySelector(cResult.className)[cResult.indexNumber];
+      } else {
+        elCol = rows.querySelector(item.colCls);
+      }
+      if (elCol.tagName !== "A") {
+        obj[item.colName] =
+          elCol.querySelector("a") && elCol.querySelector("a").href
+            ? elCol.querySelector("a").href
+            : "";
+      } else {
+        obj[item.colName] = elCol && elCol.href ? elCol.href : "";
+      }
+    } else if (item.contentType === "html") {
+      let elHtml;
+      if (item.colCls.includes("eq")) {
+        var cResult = getSiblingIndex(item.colCls);
+        elHtml = rows.querySelector(cResult.className)[cResult.indexNumber];
+      } else {
+        elHtml = rows.querySelector(item.colCls);
+      }
+      obj[item.colName] = elHtml && elHtml.innerHTML ? elHtml.innerHTML : "";
+    }
+  });
+  return obj;
 };

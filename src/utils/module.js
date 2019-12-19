@@ -1,5 +1,5 @@
 import { chromeId, schemaObj } from "./globalVar";
-// import { utils, write, writeFile } from "xlsx";
+import { utils } from "xlsx";
 var sTarget;
 var prevElementFlag;
 
@@ -258,12 +258,11 @@ export class InputCheckList extends RunTimeSendMsg {
       let rowCls = document.querySelector("input[name=rowCls]").value;
       schemaObj.schema["row"] = { rowName, rowCls };
       e.target.parentElement.innerHTML = "";
-      console.log(schemaObj);
     });
     this.lookupParent();
     this.lookupSibling(rowCls);
   }
-  selectClassForCol(parentEl) {
+  selectClassForCol(parentEl, colIndex) {
     let colClass = parentEl.querySelector("input[name=colCls]");
     this.element.addEventListener("change", e => {
       let val = this.element.querySelector("input[name=cls]:checked").value;
@@ -284,9 +283,8 @@ export class InputCheckList extends RunTimeSendMsg {
       let colCls = parentEl.querySelector("input[name=colCls]").value;
       let contentType = parentEl.querySelector("select[name=contentType]")
         .value;
-      schemaObj.schema.columns.push({ colName, colCls, contentType });
+      schemaObj.schema.columns[colIndex] = { colName, colCls, contentType };
       e.target.parentElement.innerHTML = "";
-      console.log(schemaObj);
     });
     this.lookupParent();
     this.lookupSibling(colClass);
@@ -400,15 +398,15 @@ export class RandomId {
 
 export class DownloaderHelper extends RandomId {
   CreateTable(element, data) {
-    // let ws = utils.json_to_sheet(data);
-    // let htmlString = utils.sheet_to_html(ws, {
-    //   id: "data-table",
-    //   editable: false
-    // });
-    // element.innerHTML = htmlString;
-    // document
-    //   .querySelector("#data-table")
-    //   .classList.add("table", "table-striped", "table-sm", "table-bordered");
+    let ws = utils.json_to_sheet(data);
+    let htmlString = utils.sheet_to_html(ws, {
+      id: "data-table",
+      editable: false
+    });
+    element.innerHTML = htmlString;
+    document
+      .querySelector("#data-table")
+      .classList.add("table", "table-striped", "table-sm", "table-bordered");
   }
   Download(type, fn, dl) {
     //   var elt = document.getElementById("data-table");

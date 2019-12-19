@@ -93,10 +93,11 @@ function gotMessage(message, sender) {
       inputBox.selectClass();
     } else {
       let sec = document.querySelector(`.${message.ref}`);
+      let colIndex = Number(message.ref.replace("colNum", "")) - 1;
       let checkboxDom = sec.querySelector(".class-checkbox-dom");
       let inputBox = new InputCheckList(checkboxDom, message.lists);
       inputBox.makeCheckBox(message.ref);
-      inputBox.selectClassForCol(sec);
+      inputBox.selectClassForCol(sec, colIndex);
     }
   }
   if (_text === "data_table") {
