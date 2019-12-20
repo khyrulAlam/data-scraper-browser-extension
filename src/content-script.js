@@ -12,9 +12,6 @@ let dsOption = new DesireOptionClassList();
 //receive massage 🚀
 chrome.runtime.onMessage.addListener(gotMessage);
 function gotMessage(message, sender) {
-  console.group("message");
-  console.log(message);
-  console.groupEnd();
   let _text = message.text;
   switch (_text) {
     case "create_iframe":
@@ -120,6 +117,7 @@ function gotMessage(message, sender) {
             sendMessage({
               text: "create_download_tab",
               website_url: location.origin,
+              name: message.name,
               tableItem: res
             });
           });
@@ -129,6 +127,7 @@ function gotMessage(message, sender) {
               sendMessage({
                 text: "create_download_tab",
                 website_url: location.origin,
+                name: message.name,
                 tableItem: [res]
               });
             }
@@ -152,6 +151,7 @@ function gotMessage(message, sender) {
             sendMessage({
               text: "new_data_send_to_download_page",
               reciverId: message.senderId,
+              name: message.name,
               tableItem: res
             });
           });
@@ -161,6 +161,7 @@ function gotMessage(message, sender) {
               sendMessage({
                 text: "new_data_send_to_download_page",
                 reciverId: message.senderId,
+                name: message.name,
                 tableItem: [res]
               });
             }

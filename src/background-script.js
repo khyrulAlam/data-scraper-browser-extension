@@ -21,16 +21,18 @@ chrome.runtime.onMessage.addListener(function(message, sender, callback) {
             text: "send_table_data_to_download_page",
             senderId: sender.tab.id,
             website_url: message.website_url,
+            name: message.name,
             tableItem: [...message.tableItem]
           });
         }, 3000);
       });
       break;
-      case "new_data_send_to_download_page":
-        chrome.tabs.sendMessage(message.reciverId,{
-          text: "new_download_data",
-          tableItem:[...message.tableItem]
-        })
+    case "new_data_send_to_download_page":
+      chrome.tabs.sendMessage(message.reciverId, {
+        text: "new_download_data",
+        name: message.name,
+        tableItem: [...message.tableItem]
+      });
       break;
   }
 });

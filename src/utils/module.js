@@ -1,5 +1,5 @@
 import { chromeId, schemaObj } from "./globalVar";
-import { utils } from "xlsx";
+import { utils, write, writeFile } from "xlsx";
 var sTarget;
 var prevElementFlag;
 
@@ -409,11 +409,19 @@ export class DownloaderHelper extends RandomId {
       .classList.add("table", "table-striped", "table-sm", "table-bordered");
   }
   Download(type, fn, dl) {
-    //   var elt = document.getElementById("data-table");
-    //   var wb = utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
-    //   var name = this.ID();
-    //   return dl
-    //     ? write(wb, { bookType: type, bookSST: true, type: "base64" })
-    //     : writeFile(wb, fn || name + "." + (type || "xlsx"));
+    var elt = document.getElementById("shadow-table");
+    var wb = utils.table_to_book(elt, { sheet: "Data Scraper Extension" });
+    var name = this.ID();
+    return dl
+      ? write(wb, { bookType: type, bookSST: true, type: "base64" })
+      : writeFile(wb, fn || name + "." + (type || "xlsx"));
+  }
+  CreateShadowTable(element, data) {
+    let ws = utils.json_to_sheet(data);
+    let htmlString = utils.sheet_to_html(ws, {
+      id: "shadow-table",
+      editable: false
+    });
+    element.innerHTML = htmlString;
   }
 }
