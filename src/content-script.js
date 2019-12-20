@@ -73,7 +73,6 @@ function gotMessage(message, sender) {
       }
       break;
     case "run_script":
-      tableItem = [];
       var rows;
 
       if (message.schema.row.rowCls.includes("eq")) {
@@ -88,19 +87,21 @@ function gotMessage(message, sender) {
       if (rows) {
         if (rows.length >= 0) {
           scrapDataFromSchema(rows, message.schema.columns).then(res => {
-            tableItem = res;
+            sendMessage({
+              text: "data_table",
+              tableItem: res
+            });
           });
         } else {
           scrapDataFromSchemaForSingleRow(rows, message.schema.columns).then(
             res => {
-              tableItem = [res];
+              sendMessage({
+                text: "data_table",
+                tableItem: [res]
+              });
             }
           );
         }
-        sendMessage({
-          text: "data_table",
-          tableItem
-        });
       }
       break;
     case "run_script_from_popup":
